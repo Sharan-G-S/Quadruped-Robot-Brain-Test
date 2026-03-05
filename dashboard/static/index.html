@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuadBot-AI — Control Dashboard</title>
+    <meta name="description" content="Real-time control dashboard for the QuadBot-AI intelligent robot dog">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- ── Header ───────────────────────────────────────────── -->
+    <header id="header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-dog"></i>
+                <span>QuadBot-AI</span>
+            </div>
+            <div class="status-indicator" id="connectionStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="mode-badge" id="modeBadge">SIMULATION</div>
+            <button class="btn-danger" id="btnEmergencyStop" title="Emergency Stop">
+                <i class="fas fa-stop-circle"></i> E-STOP
+            </button>
+        </div>
+    </header>
+
+    <!-- ── Main Grid ────────────────────────────────────────── -->
+    <main id="mainGrid">
+        <!-- Camera Feed -->
+        <section class="panel camera-panel" id="cameraPanel">
+            <div class="panel-header">
+                <h2><i class="fas fa-video"></i> Camera Feed</h2>
+                <span class="badge" id="camFPS">0 FPS</span>
+            </div>
+            <div class="camera-container">
+                <canvas id="cameraCanvas" width="640" height="480"></canvas>
+                <div class="camera-overlay" id="cameraOverlay">
+                    <i class="fas fa-camera-slash"></i>
+                    <p>No camera feed</p>
+                </div>
+            </div>
+            <div class="vision-info" id="visionInfo">
+                <span id="sceneDescription">Waiting for vision analysis...</span>
+            </div>
+        </section>
+
+        <!-- Robot State -->
+        <section class="panel state-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-brain"></i> Robot State</h2>
+            </div>
+            <div class="state-grid">
+                <div class="state-card">
+                    <div class="state-label">State</div>
+                    <div class="state-value" id="robotState">IDLE</div>
+                </div>
+                <div class="state-card">
+                    <div class="state-label">Gait</div>
+                    <div class="state-value" id="currentGait">stand</div>
+                </div>
+                <div class="state-card">
+                    <div class="state-label">Speed</div>
+                    <div class="state-value" id="currentSpeed">0.0</div>
+                </div>
+                <div class="state-card">
+                    <div class="state-label">Safety</div>
+                    <div class="state-value safe" id="safetyStatus">SAFE</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- IMU Visualization -->
+        <section class="panel imu-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-compass"></i> IMU / Orientation</h2>
+            </div>
+            <div class="imu-grid">
+                <div class="imu-gauge">
+                    <canvas id="rollGauge" width="120" height="120"></canvas>
+                    <span class="gauge-label">Roll <span id="rollValue">0.0°</span></span>
+                </div>
+                <div class="imu-gauge">
+                    <canvas id="pitchGauge" width="120" height="120"></canvas>
+                    <span class="gauge-label">Pitch <span id="pitchValue">0.0°</span></span>
+                </div>
+                <div class="imu-gauge">
+                    <canvas id="yawGauge" width="120" height="120"></canvas>
+                    <span class="gauge-label">Yaw <span id="yawValue">0.0°</span></span>
+                </div>
+            </div>
+            <div class="sensor-row">
+                <div class="sensor-item">
+                    <i class="fas fa-ruler"></i>
+                    Distance: <span id="distanceValue">--</span> cm
+                </div>
+                <div class="sensor-item" id="obstacleIndicator">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="obstacleText">Clear</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gait Controls -->
+        <section class="panel controls-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-gamepad"></i> Gait Controls</h2>
+            </div>
+            <div class="control-grid">
+                <button class="ctrl-btn" data-action="stand"><i class="fas fa-arrows-up-down"></i> Stand</button>
+                <button class="ctrl-btn" data-action="sit"><i class="fas fa-chair"></i> Sit</button>
+                <button class="ctrl-btn" data-action="lay_down"><i class="fas fa-bed"></i> Lay Down</button>
+                <button class="ctrl-btn primary" data-action="walk_forward"><i class="fas fa-walking"></i> Walk</button>
+                <button class="ctrl-btn primary" data-action="trot"><i class="fas fa-running"></i> Trot</button>
+                <button class="ctrl-btn" data-action="turn_left"><i class="fas fa-arrow-rotate-left"></i> Turn Left</button>
+                <button class="ctrl-btn" data-action="turn_right"><i class="fas fa-arrow-rotate-right"></i> Turn Right</button>
+                <button class="ctrl-btn" data-action="stop"><i class="fas fa-pause"></i> Stop</button>
+            </div>
+            <div class="speed-control">
+                <label>Speed</label>
+                <input type="range" id="speedSlider" min="0.1" max="1.0" step="0.1" value="0.5">
+                <span id="speedLabel">0.5</span>
+            </div>
+        </section>
+
+        <!-- Command Input -->
+        <section class="panel command-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-terminal"></i> Command</h2>
+            </div>
+            <div class="command-area">
+                <div class="command-log" id="commandLog">
+                    <div class="log-entry system">QuadBot-AI ready. Type a command or use the controls.</div>
+                </div>
+                <div class="command-input-row">
+                    <input type="text" id="commandInput" placeholder='Try: "walk forward" or "what do you see?"'
+                           autocomplete="off">
+                    <button id="btnSendCommand"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Decision Log -->
+        <section class="panel decision-panel">
+            <div class="panel-header">
+                <h2><i class="fas fa-lightbulb"></i> Brain Decisions</h2>
+            </div>
+            <div class="decision-log" id="decisionLog">
+                <div class="decision-entry">Waiting for brain activity...</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>
