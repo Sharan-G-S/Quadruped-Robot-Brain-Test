@@ -203,7 +203,7 @@ What action should the robot take?"""
         })
         if len(self._history) > self._max_history:
             self._history.pop(0)
-        logger.info(f"🧠 Decision: {decision['action']} — {decision['reasoning']}")
+        logger.info(f"Decision: {decision['action']} -- {decision['reasoning']}")
 
     @property
     def last_decision(self) -> Optional[Dict]:

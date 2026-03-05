@@ -33,11 +33,11 @@ class LLMClient:
             import openai
             api_key = cfg.get("api_key", "")
             if not api_key or api_key.startswith("YOUR_"):
-                logger.warning("⚠️  OpenAI API key not set — LLM calls will fail")
+                logger.warning("OpenAI API key not set -- LLM calls will fail")
             self._client = openai.OpenAI(api_key=api_key)
             self._model = cfg.get("model", "gpt-4o")
             self._max_tokens = cfg.get("max_tokens", 1024)
-            logger.info(f"✅ OpenAI client: {self._model}")
+            logger.info(f"OpenAI client ready: {self._model}")
         except ImportError:
             logger.error("openai package not installed")
         except Exception as e:
@@ -48,12 +48,12 @@ class LLMClient:
             import google.generativeai as genai
             api_key = cfg.get("api_key", "")
             if not api_key or api_key.startswith("YOUR_"):
-                logger.warning("⚠️  Gemini API key not set — LLM calls will fail")
+                logger.warning("Gemini API key not set -- LLM calls will fail")
             genai.configure(api_key=api_key)
             self._model = cfg.get("model", "gemini-2.0-flash")
             self._max_tokens = cfg.get("max_tokens", 1024)
             self._client = genai.GenerativeModel(self._model)
-            logger.info(f"✅ Gemini client: {self._model}")
+            logger.info(f"Gemini client ready: {self._model}")
         except ImportError:
             logger.error("google-generativeai package not installed")
         except Exception as e:

@@ -33,7 +33,7 @@ class SafetySystem:
         self._emergency_callback: Optional[Callable] = None
         self._consecutive_tilt_count = 0
 
-        logger.info(f"🛡️ Safety system initialized (enabled={self.enabled})")
+        logger.info(f"Safety system initialized (enabled={self.enabled})")
 
     def set_emergency_callback(self, callback: Callable):
         """Set callback for when emergency is triggered."""
@@ -71,7 +71,7 @@ class SafetySystem:
         # Trigger emergency if unsafe
         if not self._is_safe and self._emergency_callback:
             reason = "; ".join(self._alerts)
-            logger.critical(f"🚨 SAFETY ALERT: {reason}")
+            logger.critical(f"SAFETY ALERT: {reason}")
             self._emergency_callback(reason)
 
         self._last_check = time.time()

@@ -83,7 +83,7 @@ class StateMachine:
         self._history: List[Dict] = []
         self._callbacks: Dict[RobotState, List[Callable]] = {}
 
-        logger.info(f"🤖 State machine initialized → {self.state.value}")
+        logger.info(f"State machine initialized -> {self.state.value}")
 
     # ── State Transitions ───────────────────────────────────────
 
@@ -104,7 +104,7 @@ class StateMachine:
         allowed = TRANSITIONS.get(self.state, [])
         if new_state not in allowed:
             logger.warning(
-                f"⛔ Invalid transition: {self.state.value} → {new_state.value}"
+                f"Invalid transition: {self.state.value} -> {new_state.value}"
             )
             return False
 
@@ -129,7 +129,7 @@ class StateMachine:
         self._state_start_time = time.time()
 
         logger.info(
-            f"🔄 State: {self._prev_state.value} → {new_state.value}"
+            f"State: {self._prev_state.value} -> {new_state.value}"
             f" ({reason})"
         )
 

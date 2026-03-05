@@ -40,7 +40,7 @@ def load_config(path: str = "config/robot_config.yaml") -> dict:
     try:
         with open(full_path, "r") as f:
             config = yaml.safe_load(f)
-        logger.info(f"📄 Config loaded: {full_path}")
+        logger.info(f"Config loaded: {full_path}")
         return config
     except Exception as e:
         logger.warning(f"Config load failed ({e}), using defaults")
@@ -69,7 +69,7 @@ class QuadBotAI:
         self._running = False
         self._loop_hz = config.get("system", {}).get("control_loop_hz", 50)
 
-        logger.info(f"🐕 QuadBot-AI initializing (mode={mode})")
+        logger.info(f"QuadBot-AI initializing (mode={mode})")
 
         # ── Hardware ────────────────────────────────────────
         from hardware.servo_driver import ServoDriver
@@ -135,7 +135,7 @@ class QuadBotAI:
         self.body.stand()
         self.servos.center_all()
 
-        logger.info("✅ QuadBot-AI fully initialized!")
+        logger.info("QuadBot-AI fully initialized")
 
     # ── Main Control Loop ───────────────────────────────────────
 
@@ -143,7 +143,7 @@ class QuadBotAI:
         """Start the main control loop."""
         self._running = True
         loop_period = 1.0 / self._loop_hz
-        logger.info(f"🚀 Control loop starting at {self._loop_hz} Hz")
+        logger.info(f"Control loop starting at {self._loop_hz} Hz")
 
         iteration = 0
         while self._running:
@@ -217,7 +217,7 @@ class QuadBotAI:
 
     def stop(self):
         """Stop the robot gracefully."""
-        logger.info("🛑 Stopping QuadBot-AI...")
+        logger.info("Stopping QuadBot-AI...")
         self._running = False
         self.body.stand()
         time.sleep(0.3)
@@ -237,7 +237,7 @@ class QuadBotAI:
             self.body.execute_action(parsed)
             action = parsed.get("action", "stop")
             self.state_machine.apply_action(action, f"user: {text}")
-            logger.info(f"🗣️ Command: '{text}' → {action}")
+            logger.info(f"Command: '{text}' -> {action}")
 
     def execute_action(self, action: dict):
         """Execute a direct action dict."""
@@ -314,7 +314,7 @@ def main():
             daemon=True,
         )
         dash_thread.start()
-        logger.info(f"🌐 Dashboard: http://localhost:{dash_cfg.get('port', 8080)}")
+        logger.info(f"Dashboard: http://localhost:{dash_cfg.get('port', 8080)}")
 
     # Run main control loop
     robot.run()

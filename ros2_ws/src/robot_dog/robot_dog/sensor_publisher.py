@@ -54,7 +54,7 @@ class SensorPublisher(Node):
         self.dist_timer = self.create_timer(0.05, self.publish_distance)  # 20Hz
         self.cam_timer = self.create_timer(0.1, self.publish_camera)     # 10Hz
 
-        self.get_logger().info("✅ SensorPublisher started")
+        self.get_logger().info("SensorPublisher started")
 
     def publish_imu(self):
         data = self.imu.read()

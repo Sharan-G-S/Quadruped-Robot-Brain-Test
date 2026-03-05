@@ -78,7 +78,7 @@ class VisionProcessor:
             self._last_result = result
             self._analysis_count += 1
             self._last_analysis_time = time.time()
-            logger.info(f"👁️ Scene: {result.get('scene_description', 'N/A')}")
+            logger.info(f"Scene: {result.get('scene_description', 'N/A')}")
         else:
             logger.warning("Vision analysis returned no result")
 

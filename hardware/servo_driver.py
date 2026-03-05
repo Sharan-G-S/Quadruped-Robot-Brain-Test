@@ -43,9 +43,9 @@ class ServoDriver:
                 self.kit.servo[i].set_pulse_width_range(
                     self.min_pulse, self.max_pulse
                 )
-            logger.info("✅ PCA9685 servo driver initialized (I2C)")
+            logger.info("PCA9685 servo driver initialized (I2C)")
         except Exception as e:
-            logger.warning(f"⚠️  PCA9685 unavailable ({e}), using simulation")
+            logger.warning(f"PCA9685 unavailable ({e}), using simulation")
             self.simulation = True
             self.kit = None
 

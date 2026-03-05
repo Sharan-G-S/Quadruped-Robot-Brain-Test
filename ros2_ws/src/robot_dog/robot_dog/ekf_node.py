@@ -96,7 +96,7 @@ class EKFNode(Node):
         )
         self.pub_timer = self.create_timer(1.0 / rate, self.publish_odom)
 
-        self.get_logger().info("✅ EKF node started (9-state)")
+        self.get_logger().info("EKF node started (9-state)")
 
     # ── IMU Callback ────────────────────────────────────────────
 

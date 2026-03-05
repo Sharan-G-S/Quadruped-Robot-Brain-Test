@@ -96,7 +96,7 @@ async def emergency_stop():
 async def telemetry_ws(websocket: WebSocket):
     """Stream real-time telemetry data."""
     await websocket.accept()
-    logger.info("📊 Telemetry WebSocket connected")
+    logger.info("Telemetry WebSocket connected")
 
     try:
         while True:
@@ -118,7 +118,7 @@ async def telemetry_ws(websocket: WebSocket):
 async def camera_ws(websocket: WebSocket):
     """Stream live camera frames as JPEG bytes."""
     await websocket.accept()
-    logger.info("📷 Camera WebSocket connected")
+    logger.info("Camera WebSocket connected")
 
     try:
         while True:
@@ -140,7 +140,7 @@ async def camera_ws(websocket: WebSocket):
 async def command_ws(websocket: WebSocket):
     """Accept text commands and return responses."""
     await websocket.accept()
-    logger.info("🎮 Command WebSocket connected")
+    logger.info("Command WebSocket connected")
 
     try:
         while True:
@@ -160,5 +160,5 @@ async def command_ws(websocket: WebSocket):
 
 def run_dashboard(host: str = "0.0.0.0", port: int = 8080):
     """Start the dashboard server."""
-    logger.info(f"🌐 Dashboard: http://{host}:{port}")
+    logger.info(f"Dashboard: http://{host}:{port}")
     uvicorn.run(app, host=host, port=port, log_level="warning")

@@ -44,16 +44,16 @@ class IMUSensor:
                 import adafruit_mpu6050, board, busio
                 i2c = busio.I2C(board.SCL, board.SDA)
                 self.sensor = adafruit_mpu6050.MPU6050(i2c, address=self.i2c_address)
-                logger.info("✅ MPU6050 initialized")
+                logger.info("MPU6050 initialized")
             elif self.sensor_type == "bno055":
                 import adafruit_bno055, board, busio
                 i2c = busio.I2C(board.SCL, board.SDA)
                 self.sensor = adafruit_bno055.BNO055_I2C(i2c, address=self.i2c_address)
-                logger.info("✅ BNO055 initialized")
+                logger.info("BNO055 initialized")
             else:
                 raise ValueError(f"Unknown IMU: {self.sensor_type}")
         except Exception as e:
-            logger.warning(f"⚠️  IMU init failed ({e}), using simulation")
+            logger.warning(f"IMU init failed ({e}), using simulation")
             self.simulation = True
 
     # ── Read ────────────────────────────────────────────────────

@@ -61,7 +61,7 @@ class CommandParser:
         )
 
         if result and result.get("confidence", 0) > 0.3:
-            logger.info(f"🗣️ Parsed: '{command}' → {result.get('action')}")
+            logger.info(f"Parsed: '{command}' -> {result.get('action')}")
             return result
 
         # Fallback: keyword-based parsing
@@ -102,7 +102,7 @@ class CommandParser:
                     "intent": intent, "action": action,
                     "parameters": params, "confidence": 0.7,
                 }
-                logger.info(f"🗣️ Keyword parsed: '{command}' → {action}")
+                logger.info(f"Keyword parsed: '{command}' -> {action}")
                 return result
 
         return {

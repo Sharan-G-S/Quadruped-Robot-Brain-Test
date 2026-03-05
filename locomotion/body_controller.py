@@ -36,7 +36,7 @@ class BodyController:
         self._pitch_lean = 0.0  # degrees
         self._yaw_lean = 0.0    # degrees
 
-        logger.info("🦿 BodyController initialized")
+        logger.info("BodyController initialized")
 
     # ── Commands ────────────────────────────────────────────────
 

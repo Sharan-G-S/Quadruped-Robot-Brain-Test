@@ -71,7 +71,7 @@ class MotorControllerNode(Node):
         self.timer = self.create_timer(1.0 / rate, self.control_loop)
 
         self._last_cmd_vel = Twist()
-        self.get_logger().info("✅ MotorController started")
+        self.get_logger().info("MotorController started")
 
     def cmd_vel_callback(self, msg: Twist):
         """Handle velocity commands (compatible with teleop_twist)."""

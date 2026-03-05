@@ -99,7 +99,7 @@ class BrainNode(Node):
         # Start in standing state
         self.state_machine.transition(RobotState.STANDING, "boot")
 
-        self.get_logger().info("✅ BrainNode started — LLM-powered intelligence active")
+        self.get_logger().info("BrainNode started -- LLM-powered intelligence active")
 
     # ── Callbacks ───────────────────────────────────────────────
 

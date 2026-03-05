@@ -40,9 +40,9 @@ class CameraModule:
             self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
             self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
             self.cap.set(cv2.CAP_PROP_FPS, self.fps)
-            logger.info(f"✅ Camera: {self.width}×{self.height} @ {self.fps}fps")
+            logger.info(f"Camera: {self.width}x{self.height} @ {self.fps}fps")
         except Exception as e:
-            logger.warning(f"⚠️  Camera unavailable ({e}), using simulation")
+            logger.warning(f"Camera unavailable ({e}), using simulation")
             self.simulation = True
             try:
                 import cv2

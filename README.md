@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">🐕 QuadBot-AI — Intelligent Robot Dog</h1>
+  <h1 align="center">QuadBot-AI -- Intelligent Robot Dog</h1>
   <p align="center">
     <strong>LLM-Powered Quadruped Robot with Computer Vision, ROS2, and EKF Sensor Fusion</strong>
   </p>
@@ -10,7 +10,7 @@
 
 ---
 
-## 🧠 Architecture
+## Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -57,7 +57,7 @@
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Quadruped-Robot-AI-Test/
@@ -104,7 +104,7 @@ Quadruped-Robot-AI-Test/
 └── README.md
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone & Install
 ```bash
@@ -135,7 +135,7 @@ ros2 launch robot_dog robot_dog_launch.py
 ### 4. Dashboard
 Open `http://localhost:8080` for the live control panel.
 
-## 🔧 Hardware Requirements
+## Hardware Requirements
 
 | Component | Example Part | Purpose |
 |-----------|-------------|---------|
@@ -149,7 +149,7 @@ Open `http://localhost:8080` for the live control panel.
 | Power | 2S/3S LiPo battery | Power supply |
 | Frame | 3D-printed / metal kit | Robot chassis |
 
-## 🧩 Modes
+## Modes
 
 | Mode | Description | Hardware Required |
 |------|-------------|-------------------|
@@ -157,7 +157,7 @@ Open `http://localhost:8080` for the live control panel.
 | `serial` | Direct serial to Arduino/ESP32 | MCU + Servos |
 | `ros2` | Full ROS2 stack with EKF | All sensors |
 
-## 📡 Communication Protocol
+## Communication Protocol
 
 Serial packets: `[0xAA, CMD, LENGTH, DATA..., CHECKSUM]`
 
@@ -173,5 +173,5 @@ Serial packets: `[0xAA, CMD, LENGTH, DATA..., CHECKSUM]`
 ---
 
 <p align="center">
-  <em>Made with ❤️ by Sharan G S</em>
+  <em>Made by Sharan G S</em>
 </p>

@@ -329,7 +329,7 @@ $$('.ctrl-btn').forEach(btn => {
 dom.btnEmergencyStop.addEventListener('click', () => {
     fetch('/api/emergency_stop', { method: 'POST' })
         .catch(err => console.error('E-stop error:', err));
-    addLogEntry('error', '🚨 EMERGENCY STOP');
+    addLogEntry('error', 'EMERGENCY STOP');
 });
 
 // Speed slider
@@ -374,7 +374,7 @@ document.addEventListener('keydown', (e) => {
     // Escape = emergency stop
     if (e.key === 'Escape') {
         fetch('/api/emergency_stop', { method: 'POST' });
-        addLogEntry('error', '🚨 EMERGENCY STOP (Esc)');
+        addLogEntry('error', 'EMERGENCY STOP (Esc)');
     }
 });
 
@@ -390,7 +390,7 @@ function init() {
     drawGauge('pitchGauge', 0, 'Pitch');
     drawGauge('yawGauge', 0, 'Yaw');
 
-    addLogEntry('system', '🐕 QuadBot-AI Dashboard initialized');
+    addLogEntry('system', 'QuadBot-AI Dashboard initialized');
     addLogEntry('system', 'Keyboard: W/A/S/D = move, R = trot, Space = stand, Esc = E-stop');
 }
 

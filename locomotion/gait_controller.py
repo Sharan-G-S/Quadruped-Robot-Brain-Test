@@ -72,7 +72,7 @@ class GaitController:
 
     def set_gait(self, gait: GaitType, speed: float = 0.5):
         if gait != self.current_gait:
-            logger.info(f"🦿 Gait → {gait.value} (speed={speed:.1f})")
+            logger.info(f"Gait -> {gait.value} (speed={speed:.1f})")
             self.current_gait = gait
             self.speed = max(0.1, min(1.0, speed))
             self._start_time = time.time()

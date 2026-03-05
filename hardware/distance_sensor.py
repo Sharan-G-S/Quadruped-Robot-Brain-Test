@@ -45,15 +45,15 @@ class DistanceSensor:
                 GPIO.output(self.trigger_pin, False)
                 time.sleep(0.1)
                 self.GPIO = GPIO
-                logger.info("✅ HC-SR04 ultrasonic initialized")
+                logger.info("HC-SR04 ultrasonic initialized")
             elif self.sensor_type == "lidar":
                 import serial
                 self.serial_conn = serial.Serial("/dev/ttyAMA0", 115200, timeout=0.1)
-                logger.info("✅ TFMini LiDAR initialized")
+                logger.info("TFMini LiDAR initialized")
             else:
                 raise ValueError(f"Unknown sensor: {self.sensor_type}")
         except Exception as e:
-            logger.warning(f"⚠️  Distance sensor failed ({e}), using simulation")
+            logger.warning(f"Distance sensor failed ({e}), using simulation")
             self.simulation = True
 
     def read(self) -> float:

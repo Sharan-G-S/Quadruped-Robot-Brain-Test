@@ -54,10 +54,10 @@ class SerialBridge:
             )
             time.sleep(2)  # Arduino resets on serial connect
             self.connected = True
-            logger.info(f"✅ Serial connected: {self.port} @ {self.baud_rate}")
+            logger.info(f"Serial connected: {self.port} @ {self.baud_rate}")
             self._start_rx_thread()
         except Exception as e:
-            logger.warning(f"⚠️  Serial connection failed ({e}), using simulation")
+            logger.warning(f"Serial connection failed ({e}), using simulation")
             self.simulation = True
             self.connected = False
 
@@ -117,7 +117,7 @@ class SerialBridge:
         """Send emergency stop command."""
         packet = SerialProtocol.encode_emergency_stop()
         self._send(packet)
-        logger.critical("🚨 Emergency stop sent via serial")
+        logger.critical("Emergency stop sent via serial")
 
     def request_sensor(self, sensor_id: int = SensorID.ALL):
         """Request sensor data from the microcontroller."""
