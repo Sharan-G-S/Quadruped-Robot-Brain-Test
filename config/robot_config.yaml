@@ -1,0 +1,131 @@
+# ============================================================
+#  QuadBot-AI  —  Central Configuration
+# ============================================================
+
+system:
+  name: "QuadBot-AI"
+  mode: "simulation"            # simulation | serial | ros2
+  log_level: "INFO"
+  control_loop_hz: 50
+
+# ─── LLM / Vision ───────────────────────────────────────────
+llm:
+  provider: "openai"            # openai | gemini
+  openai:
+    api_key: "YOUR_OPENAI_API_KEY"
+    model: "gpt-4o"
+    max_tokens: 1024
+  gemini:
+    api_key: "YOUR_GEMINI_API_KEY"
+    model: "gemini-2.0-flash"
+    max_tokens: 1024
+  vision_interval_sec: 2.0
+  temperature: 0.3
+
+# ─── Camera ──────────────────────────────────────────────────
+camera:
+  device_id: 0
+  width: 640
+  height: 480
+  fps: 30
+
+# ─── Robot Body (mm) ────────────────────────────────────────
+body:
+  length: 200.0
+  width: 110.0
+  default_height: 150.0
+
+# ─── Leg Dimensions (mm) ────────────────────────────────────
+leg:
+  hip_length: 50.0
+  upper_length: 107.0
+  lower_length: 130.0
+
+# ─── Servos ──────────────────────────────────────────────────
+servos:
+  driver: "pca9685"             # pca9685 | serial
+  i2c_address: 0x40
+  frequency: 50
+  channels:
+    FR: [0, 1, 2]
+    FL: [3, 4, 5]
+    RR: [6, 7, 8]
+    RL: [9, 10, 11]
+  offsets: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  min_pulse: 500
+  max_pulse: 2500
+  min_angle: 0
+  max_angle: 180
+
+# ─── Gaits ───────────────────────────────────────────────────
+gait:
+  default_gait: "trot"
+  step_height: 30.0
+  step_length: 60.0
+  cycle_time: 0.8
+  walk_speed: 0.3
+  trot_speed: 0.5
+  body_swing: 5.0
+
+# ─── IMU ─────────────────────────────────────────────────────
+imu:
+  type: "mpu6050"               # mpu6050 | bno055 | simulation
+  i2c_address: 0x68
+  sample_rate_hz: 100
+  complementary_alpha: 0.96
+
+# ─── Distance Sensor ────────────────────────────────────────
+distance_sensor:
+  type: "ultrasonic"            # ultrasonic | lidar | simulation
+  trigger_pin: 23
+  echo_pin: 24
+  max_distance_cm: 400
+  min_distance_cm: 2
+  obstacle_threshold_cm: 25
+
+# ─── Serial ──────────────────────────────────────────────────
+serial:
+  port: "/dev/ttyUSB0"
+  baud_rate: 115200
+  timeout: 0.1
+  heartbeat_interval: 1.0
+
+# ─── ROS2 ────────────────────────────────────────────────────
+ros2:
+  namespace: "robot_dog"
+  topics:
+    imu: "/robot_dog/imu/data"
+    camera: "/robot_dog/camera/image_raw"
+    distance: "/robot_dog/distance"
+    cmd_vel: "/robot_dog/cmd_vel"
+    odom: "/robot_dog/odom"
+    brain_cmd: "/robot_dog/brain/command"
+    robot_state: "/robot_dog/state"
+
+# ─── EKF ─────────────────────────────────────────────────────
+ekf:
+  process_noise:
+    position: 0.01
+    velocity: 0.1
+    orientation: 0.01
+  measurement_noise:
+    imu_accel: 0.5
+    imu_gyro: 0.05
+    gps_position: 1.0
+  initial_covariance: 1.0
+  state_dims: 9
+
+# ─── Safety ──────────────────────────────────────────────────
+safety:
+  max_tilt_degrees: 45.0
+  max_accel_g: 3.0
+  min_battery_voltage: 6.0
+  emergency_stop_enabled: true
+
+# ─── Dashboard ───────────────────────────────────────────────
+dashboard:
+  host: "0.0.0.0"
+  port: 8080
+  enable_camera_stream: true
+  stream_fps: 15
+  cors_origins: ["*"]
