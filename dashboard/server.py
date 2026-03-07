@@ -90,6 +90,44 @@ async def emergency_stop():
     return {"error": "robot not initialized"}
 
 
+@app.get("/api/mode")
+async def get_mode():
+    """Get current control mode."""
+    if _robot:
+        return _robot.mode_manager.get_telemetry()
+    return {"error": "robot not initialized"}
+
+
+@app.post("/api/mode")
+async def set_mode(payload: dict):
+    """Switch control mode. Body: {"mode": "manual|autonomous|hybrid"}"""
+    if not _robot:
+        return {"error": "robot not initialized"}
+    new_mode = payload.get("mode", "")
+    success = _robot.mode_manager.switch_mode(new_mode)
+    if success:
+        # Enable/disable autonomous controller
+        if _robot.mode_manager.is_manual:
+            _robot.auto_ctrl.disable()
+        else:
+            _robot.auto_ctrl.enable()
+        return {"status": "ok", "mode": _robot.mode_manager.mode.value}
+    return {"error": f"invalid mode: {new_mode}"}
+
+
+@app.post("/api/manual")
+async def manual_command(payload: dict):
+    """Submit a manual command. Body: {"action": "walk_forward", "speed": 0.5}"""
+    if not _robot:
+        return {"error": "robot not initialized"}
+    if not _robot.mode_manager.should_accept_manual:
+        return {"error": "not in manual/hybrid mode"}
+    action = payload.get("action", "stop")
+    speed = payload.get("speed", 0.5)
+    result = _robot.manual_ctrl.submit_command(action, speed)
+    return {"status": "ok", "action": result}
+
+
 # ── WebSocket: Telemetry ────────────────────────────────────────
 
 @app.websocket("/ws/telemetry")

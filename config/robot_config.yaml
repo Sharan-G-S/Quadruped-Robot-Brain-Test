@@ -115,6 +115,12 @@ ekf:
   initial_covariance: 1.0
   state_dims: 9
 
+# ─── Control Mode ────────────────────────────────────────────
+control:
+  default_mode: "autonomous"        # manual | autonomous | hybrid
+  allow_mode_switch: true
+  manual_timeout_sec: 0             # 0 = no timeout, >0 = auto-switch to autonomous
+
 # ─── Safety ──────────────────────────────────────────────────
 safety:
   max_tilt_degrees: 45.0

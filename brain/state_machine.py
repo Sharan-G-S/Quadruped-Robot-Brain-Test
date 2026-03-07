@@ -24,6 +24,7 @@ class RobotState(Enum):
     FOLLOWING = "following"
     SITTING = "sitting"
     LAYING_DOWN = "laying_down"
+    MANUAL_CONTROL = "manual_control"
     EMERGENCY_STOP = "emergency_stop"
 
 
@@ -35,7 +36,7 @@ TRANSITIONS = {
     RobotState.STANDING: [
         RobotState.WALKING, RobotState.TROTTING, RobotState.TURNING,
         RobotState.EXPLORING, RobotState.SITTING, RobotState.LAYING_DOWN,
-        RobotState.IDLE, RobotState.EMERGENCY_STOP,
+        RobotState.MANUAL_CONTROL, RobotState.IDLE, RobotState.EMERGENCY_STOP,
     ],
     RobotState.WALKING: [
         RobotState.STANDING, RobotState.TROTTING, RobotState.TURNING,
@@ -66,6 +67,11 @@ TRANSITIONS = {
     ],
     RobotState.LAYING_DOWN: [
         RobotState.STANDING, RobotState.EMERGENCY_STOP,
+    ],
+    RobotState.MANUAL_CONTROL: [
+        RobotState.STANDING, RobotState.WALKING, RobotState.TROTTING,
+        RobotState.TURNING, RobotState.SITTING, RobotState.LAYING_DOWN,
+        RobotState.EMERGENCY_STOP,
     ],
     RobotState.EMERGENCY_STOP: [
         RobotState.IDLE, RobotState.STANDING,
@@ -158,6 +164,7 @@ class StateMachine:
             "sit": RobotState.SITTING,
             "lay_down": RobotState.LAYING_DOWN,
             "explore": RobotState.EXPLORING,
+            "manual_control": RobotState.MANUAL_CONTROL,
             "avoid_obstacle": RobotState.OBSTACLE_AVOIDANCE,
         }
         return mapping.get(action)

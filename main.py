@@ -56,14 +56,17 @@ class QuadBotAI:
     Pipeline per loop iteration:
       1. Read sensors (IMU, distance, camera)
       2. Safety check
-      3. Vision analysis (periodic)
-      4. Decision making
-      5. Locomotion update (gait → IK → servos)
-      6. Communication (serial/ROS2)
-      7. Telemetry broadcast
+      3. Control mode check (manual / autonomous / hybrid)
+      4. Manual command processing (if applicable)
+      5. Vision analysis (if autonomous/hybrid)
+      6. Decision making (if autonomous/hybrid)
+      7. Locomotion update (gait → IK → servos)
+      8. Communication (serial/ROS2)
+      9. Telemetry broadcast
     """
 
-    def __init__(self, config: dict, mode: str = "simulation"):
+    def __init__(self, config: dict, mode: str = "simulation",
+                 control_mode: str = "autonomous"):
         self.config = config
         self.mode = mode
         self._running = False
@@ -130,12 +133,31 @@ class QuadBotAI:
             from communication.serial_bridge import SerialBridge
             self.serial_bridge = SerialBridge(config.get("serial", {}))
 
+        # ── Control Mode System ─────────────────────────────
+        from control.mode_manager import ModeManager
+        from control.manual_controller import ManualController
+        from control.autonomous_controller import AutonomousController
+
+        control_cfg = config.get("control", {})
+        control_cfg.setdefault("default_mode", control_mode)
+
+        self.mode_manager = ModeManager(control_cfg)
+        self.manual_ctrl = ManualController()
+        self.auto_ctrl = AutonomousController()
+
+        # Enable/disable autonomous based on initial mode
+        if self.mode_manager.is_manual:
+            self.auto_ctrl.disable()
+
         # ── Boot ────────────────────────────────────────────
         self.state_machine.transition(RobotState.STANDING, "boot")
         self.body.stand()
         self.servos.center_all()
 
-        logger.info("QuadBot-AI fully initialized")
+        logger.info(
+            f"QuadBot-AI fully initialized "
+            f"(control={self.mode_manager.mode.value})"
+        )
 
     # ── Main Control Loop ───────────────────────────────────────
 
@@ -167,38 +189,57 @@ class QuadBotAI:
                     if self.serial_bridge:
                         self.serial_bridge.send_emergency_stop()
                 else:
-                    # 3. Vision analysis (periodic, not every loop)
-                    if self.vision.should_analyze():
-                        frame = self.camera.capture_frame()
-                        if frame is not None:
-                            b64 = self.camera.frame_to_base64(frame)
-                            if b64:
-                                ctx = f"State: {self.state_machine.state.value}"
-                                self.vision.analyze_frame(b64, ctx)
+                    # 3. Check for manual mode timeout
+                    self.mode_manager.check_timeout()
 
-                    # 4. Decision making (every ~10 iterations)
-                    if iteration % 10 == 0:
-                        decision = self.decision.decide(
-                            vision_result=self.vision.last_result,
-                            sensor_data=dist_data,
-                            current_state=self.state_machine.state.value,
-                        )
-                        action = decision.get("action", "stop")
-                        self.body.execute_action(decision)
-                        self.state_machine.apply_action(
-                            action, decision.get("reasoning", ""))
+                    # 4. Process manual commands (if manual/hybrid)
+                    manual_action = None
+                    if self.mode_manager.should_accept_manual:
+                        manual_action = self.manual_ctrl.get_pending_action()
+                        if manual_action:
+                            self.body.execute_action(manual_action)
+                            action = manual_action.get("action", "stop")
+                            self.state_machine.apply_action(
+                                action, f"manual: {action}")
 
-                    # 5. IMU stabilization
+                    # 5-6. Autonomous pipeline (if autonomous/hybrid
+                    #       and no manual override this cycle)
+                    if (self.mode_manager.should_run_autonomy
+                            and not manual_action):
+                        # 5. Vision analysis (periodic)
+                        if self.vision.should_analyze():
+                            frame = self.camera.capture_frame()
+                            if frame is not None:
+                                b64 = self.camera.frame_to_base64(frame)
+                                if b64:
+                                    ctx = f"State: {self.state_machine.state.value}"
+                                    self.vision.analyze_frame(b64, ctx)
+
+                        # 6. Decision making (every ~10 iterations)
+                        if iteration % 10 == 0:
+                            decision = self.auto_ctrl.process_decision(
+                                vision_result=self.vision.last_result,
+                                sensor_data=dist_data,
+                                current_state=self.state_machine.state.value,
+                                decision_engine=self.decision,
+                            )
+                            if decision:
+                                action = decision.get("action", "stop")
+                                self.body.execute_action(decision)
+                                self.state_machine.apply_action(
+                                    action, decision.get("reasoning", ""))
+
+                    # 7. IMU stabilization
                     self.body.compensate_tilt(
                         imu_data.get("roll", 0),
                         imu_data.get("pitch", 0),
                     )
 
-                    # 6. Locomotion update → servo angles
+                    # 8. Locomotion update -> servo angles
                     angles = self.body.update()
                     self.servos.set_all_legs(angles)
 
-                    # 7. Serial communication
+                    # 9. Serial communication
                     if self.serial_bridge:
                         self.serial_bridge.send_all_legs(
                             self.config.get("servos", {}).get("channels", {}),
@@ -258,6 +299,7 @@ class QuadBotAI:
         """Get full system telemetry for dashboard."""
         return {
             "mode": self.mode,
+            "control": self.mode_manager.get_telemetry(),
             "state_machine": self.state_machine.get_telemetry(),
             "body": self.body.get_telemetry(),
             "imu": self.imu.get_telemetry(),
@@ -267,6 +309,8 @@ class QuadBotAI:
             "safety": self.safety.get_telemetry(),
             "vision": self.vision.get_telemetry(),
             "decision": self.decision.get_telemetry(),
+            "manual": self.manual_ctrl.get_telemetry(),
+            "autonomous": self.auto_ctrl.get_telemetry(),
             "serial": self.serial_bridge.get_telemetry() if self.serial_bridge else None,
         }
 
@@ -290,7 +334,8 @@ def main():
         sys.exit(0)
 
     config = load_config(args.config)
-    robot = QuadBotAI(config, mode=args.mode)
+    robot = QuadBotAI(config, mode=args.mode,
+                      control_mode=args.control_mode)
 
     # Graceful shutdown
     def signal_handler(sig, frame):

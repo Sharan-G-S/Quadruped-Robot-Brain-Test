@@ -15,6 +15,8 @@ const state = {
     camFrames: 0,
     lastFPSTime: Date.now(),
     fps: 0,
+    controlMode: 'autonomous',
+    joystickActive: false,
 };
 
 // ── DOM Elements ───────────────────────────────────────────────
@@ -48,6 +50,13 @@ const dom = {
     btnSendCommand: $('#btnSendCommand'),
     commandLog: $('#commandLog'),
     decisionLog: $('#decisionLog'),
+    joystickPanel: $('#joystickPanel'),
+    joystickZone: $('#joystickZone'),
+    joystickStick: $('#joystickStick'),
+    manualBadge: $('#manualBadge'),
+    joyX: $('#joyX'),
+    joyY: $('#joyY'),
+    joyAction: $('#joyAction'),
 };
 
 const cameraCtx = dom.cameraCanvas.getContext('2d');
@@ -201,6 +210,13 @@ function updateTelemetry(data) {
     // Decision
     if (data.decision && data.decision.last_action) {
         addDecisionEntry(data.decision.last_action, data.decision.last_reasoning);
+    }
+
+    // Control Mode
+    if (data.control) {
+        const mode = data.control.mode || 'autonomous';
+        state.controlMode = mode;
+        updateModeUI(mode);
     }
 }
 
@@ -395,3 +411,135 @@ function init() {
 }
 
 init();
+
+// ── Mode Switcher ──────────────────────────────────────────────
+
+function updateModeUI(mode) {
+    $$('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+
+    const isManual = mode === 'manual' || mode === 'hybrid';
+    dom.joystickPanel.classList.toggle('disabled-panel', !isManual);
+    dom.manualBadge.textContent = isManual ? 'ACTIVE' : 'DISABLED';
+    dom.manualBadge.className = 'badge ' + (isManual ? 'badge-active' : '');
+}
+
+function switchMode(mode) {
+    fetch('/api/mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode }),
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                state.controlMode = mode;
+                updateModeUI(mode);
+                addLogEntry('system', `Mode switched to: ${mode.toUpperCase()}`);
+            } else {
+                addLogEntry('error', `Mode switch failed: ${data.error}`);
+            }
+        })
+        .catch(err => addLogEntry('error', 'Mode switch failed'));
+}
+
+$$('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+});
+
+// ── Virtual Joystick ───────────────────────────────────────────
+
+(function initJoystick() {
+    const zone = dom.joystickZone;
+    const stick = dom.joystickStick;
+    if (!zone || !stick) return;
+
+    let active = false;
+    let baseRect = null;
+    let sendTimer = null;
+
+    function getPos(e) {
+        const touch = e.touches ? e.touches[0] : e;
+        return { x: touch.clientX, y: touch.clientY };
+    }
+
+    function onStart(e) {
+        e.preventDefault();
+        if (state.controlMode !== 'manual' && state.controlMode !== 'hybrid') return;
+        active = true;
+        state.joystickActive = true;
+        baseRect = zone.querySelector('.joystick-base').getBoundingClientRect();
+    }
+
+    function onMove(e) {
+        if (!active || !baseRect) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        const cx = baseRect.left + baseRect.width / 2;
+        const cy = baseRect.top + baseRect.height / 2;
+        const maxR = baseRect.width / 2 - 15;
+
+        let dx = pos.x - cx;
+        let dy = -(pos.y - cy); // Invert Y: up = positive
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > maxR) {
+            dx = dx / dist * maxR;
+            dy = dy / dist * maxR;
+        }
+
+        const normX = dx / maxR;
+        const normY = dy / maxR;
+
+        stick.style.transform = `translate(${dx}px, ${-dy}px)`;
+
+        dom.joyX.textContent = normX.toFixed(2);
+        dom.joyY.textContent = normY.toFixed(2);
+
+        // Determine action
+        let action = 'stop';
+        if (Math.abs(normY) > 0.15 || Math.abs(normX) > 0.15) {
+            if (Math.abs(normY) > Math.abs(normX)) {
+                action = normY > 0 ? 'walk_forward' : 'stop';
+            } else {
+                action = normX > 0 ? 'turn_right' : 'turn_left';
+            }
+        }
+        dom.joyAction.textContent = action;
+
+        // Throttled send
+        clearTimeout(sendTimer);
+        sendTimer = setTimeout(() => {
+            const speed = Math.min(1.0, dist / maxR);
+            fetch('/api/manual', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, speed: parseFloat(speed.toFixed(2)) }),
+            }).catch(() => { });
+        }, 80);
+    }
+
+    function onEnd() {
+        if (!active) return;
+        active = false;
+        state.joystickActive = false;
+        stick.style.transform = 'translate(0, 0)';
+        dom.joyX.textContent = '0.00';
+        dom.joyY.textContent = '0.00';
+        dom.joyAction.textContent = 'stop';
+        clearTimeout(sendTimer);
+        fetch('/api/manual', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'stop', speed: 0 }),
+        }).catch(() => { });
+    }
+
+    zone.addEventListener('mousedown', onStart);
+    zone.addEventListener('touchstart', onStart, { passive: false });
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+})();

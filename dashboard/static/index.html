@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuadBot-AI — Control Dashboard</title>
     <meta name="description" content="Real-time control dashboard for the QuadBot-AI intelligent robot dog">
     <link rel="stylesheet" href="/static/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body>
     <!-- ── Header ───────────────────────────────────────────── -->
     <header id="header">
@@ -23,6 +27,17 @@
             </div>
         </div>
         <div class="header-right">
+            <div class="mode-switcher" id="modeSwitcher">
+                <button class="mode-btn" data-mode="manual" title="Manual Control">
+                    <i class="fas fa-gamepad"></i> Manual
+                </button>
+                <button class="mode-btn active" data-mode="autonomous" title="Autonomous AI">
+                    <i class="fas fa-robot"></i> Auto
+                </button>
+                <button class="mode-btn" data-mode="hybrid" title="Hybrid Mode">
+                    <i class="fas fa-sliders-h"></i> Hybrid
+                </button>
+            </div>
             <div class="mode-badge" id="modeBadge">SIMULATION</div>
             <button class="btn-danger" id="btnEmergencyStop" title="Emergency Stop">
                 <i class="fas fa-stop-circle"></i> E-STOP
@@ -75,6 +90,32 @@
             </div>
         </section>
 
+        <!-- Joystick Panel (Manual/Hybrid) -->
+        <section class="panel joystick-panel" id="joystickPanel">
+            <div class="panel-header">
+                <h2><i class="fas fa-arrows-alt"></i> Manual Joystick</h2>
+                <span class="badge" id="manualBadge">DISABLED</span>
+            </div>
+            <div class="joystick-container">
+                <div class="joystick-zone" id="joystickZone">
+                    <div class="joystick-base">
+                        <div class="joystick-stick" id="joystickStick"></div>
+                    </div>
+                    <div class="joystick-labels">
+                        <span class="jl-up">FWD</span>
+                        <span class="jl-down">BACK</span>
+                        <span class="jl-left">LEFT</span>
+                        <span class="jl-right">RIGHT</span>
+                    </div>
+                </div>
+                <div class="joystick-info">
+                    <div class="ji-item">X: <span id="joyX">0.00</span></div>
+                    <div class="ji-item">Y: <span id="joyY">0.00</span></div>
+                    <div class="ji-item">Action: <span id="joyAction">stop</span></div>
+                </div>
+            </div>
+        </section>
+
         <!-- IMU Visualization -->
         <section class="panel imu-panel">
             <div class="panel-header">
@@ -117,8 +158,10 @@
                 <button class="ctrl-btn" data-action="lay_down"><i class="fas fa-bed"></i> Lay Down</button>
                 <button class="ctrl-btn primary" data-action="walk_forward"><i class="fas fa-walking"></i> Walk</button>
                 <button class="ctrl-btn primary" data-action="trot"><i class="fas fa-running"></i> Trot</button>
-                <button class="ctrl-btn" data-action="turn_left"><i class="fas fa-arrow-rotate-left"></i> Turn Left</button>
-                <button class="ctrl-btn" data-action="turn_right"><i class="fas fa-arrow-rotate-right"></i> Turn Right</button>
+                <button class="ctrl-btn" data-action="turn_left"><i class="fas fa-arrow-rotate-left"></i> Turn
+                    Left</button>
+                <button class="ctrl-btn" data-action="turn_right"><i class="fas fa-arrow-rotate-right"></i> Turn
+                    Right</button>
                 <button class="ctrl-btn" data-action="stop"><i class="fas fa-pause"></i> Stop</button>
             </div>
             <div class="speed-control">
@@ -139,7 +182,7 @@
                 </div>
                 <div class="command-input-row">
                     <input type="text" id="commandInput" placeholder='Try: "walk forward" or "what do you see?"'
-                           autocomplete="off">
+                        autocomplete="off">
                     <button id="btnSendCommand"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
@@ -158,4 +201,5 @@
 
     <script src="/static/dashboard.js"></script>
 </body>
+
 </html>

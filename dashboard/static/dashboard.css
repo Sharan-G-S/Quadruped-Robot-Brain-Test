@@ -465,6 +465,141 @@ body {
     .control-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ── Mode Switcher ──────────────────────────────────────────── */
+
+.mode-switcher {
+    display: flex;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    padding: 2px;
+    border: 1px solid var(--border-glass);
+}
+
+.mode-btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.mode-btn:hover { color: var(--text-primary); }
+
+.mode-btn.active {
+    background: var(--accent);
+    color: var(--bg-primary);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.mode-btn[data-mode="manual"].active {
+    background: #3b82f6;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.mode-btn[data-mode="hybrid"].active {
+    background: var(--accent-purple);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+}
+
+/* ── Joystick Panel ─────────────────────────────────────────── */
+
+.joystick-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 20px;
+}
+
+.joystick-zone {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+
+.joystick-base {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid rgba(6, 182, 212, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto;
+    position: relative;
+    touch-action: none;
+    user-select: none;
+}
+
+.joystick-stick {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), #0891b2);
+    box-shadow: 0 0 16px var(--accent-glow);
+    cursor: grab;
+    transition: transform 0.05s linear;
+    will-change: transform;
+}
+
+.joystick-stick:active { cursor: grabbing; }
+
+.joystick-labels {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.joystick-labels span {
+    position: absolute;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.jl-up    { top: -4px; left: 50%; transform: translateX(-50%); }
+.jl-down  { bottom: -4px; left: 50%; transform: translateX(-50%); }
+.jl-left  { left: -8px; top: 50%; transform: translateY(-50%); }
+.jl-right { right: -8px; top: 50%; transform: translateY(-50%); }
+
+.joystick-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ji-item {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+}
+
+.ji-item span {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.badge-active {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: var(--accent-green) !important;
+}
+
+.disabled-panel {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
 /* ── Scrollbar ──────────────────────────────────────────────── */
 
 ::-webkit-scrollbar { width: 4px; }
